@@ -3,41 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sexy Snake 🔞 - Mobile Ready</title>
+    <title>Sexy Snake 🔞 - Sensory Experience</title>
     <style>
-        body { background: #1a1a1a; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100vh; margin: 0; overflow: hidden; touch-action: manipulation; }
-        .header { height: 60px; display: flex; align-items: center; justify-content: center; width: 100%; }
-        canvas { background: #000; border: 2px solid #ff4d4d; box-shadow: 0 0 15px rgba(255, 77, 77, 0.3); display: none; max-width: 90vw; max-height: 50vh; }
-        .info { font-size: 20px; color: #ff4d4d; font-weight: bold; margin: 5px 0; display: none; }
+        body { background: #1a1a1a; color: white; font-family: 'Helvetica Neue', Arial, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100vh; margin: 0; overflow: hidden; touch-action: manipulation; }
         
-        /* 虚拟按键样式 */
-        .controls { display: none; grid-template-columns: repeat(3, 70px); grid-template-rows: repeat(2, 70px); gap: 10px; margin-top: 20px; }
-        .btn { background: rgba(255, 77, 77, 0.2); border: 2px solid #ff4d4d; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; cursor: pointer; -webkit-tap-highlight-color: transparent; }
-        .btn:active { background: rgba(255, 77, 77, 0.6); transform: scale(0.95); }
+        /* 顶部标题栏 */
+        .title-bar { width: 100%; padding: 20px 0; text-align: center; background: linear-gradient(180deg, #2a2a2a 0%, #1a1a1a 100%); border-bottom: 1px solid #333; }
+        .title-bar h1 { color: #ff4d4d; font-size: 32px; margin: 0; letter-spacing: 2px; text-shadow: 0 0 10px rgba(255, 77, 77, 0.5); }
+        .title-bar p { color: #888; font-size: 14px; margin: 5px 0 0 0; }
+
+        canvas { background: #000; border: 3px solid #ff4d4d; box-shadow: 0 0 30px rgba(255, 77, 77, 0.2); display: none; margin-top: 20px; border-radius: 10px; }
+        .info { font-size: 24px; color: #ff4d4d; font-weight: bold; margin: 15px 0; display: none; }
+        
+        .controls { display: none; grid-template-columns: repeat(3, 80px); grid-template-rows: repeat(2, 80px); gap: 15px; margin-top: 30px; }
+        .btn { background: rgba(255, 77, 77, 0.1); border: 2px solid #ff4d4d; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: all 0.1s; }
+        .btn:active { background: rgba(255, 77, 77, 0.5); transform: scale(0.9); }
         .btn-up { grid-column: 2; }
         .btn-left { grid-column: 1; grid-row: 2; }
         .btn-down { grid-column: 2; grid-row: 2; }
         .btn-right { grid-column: 3; grid-row: 2; }
 
-        #start-screen { position: absolute; top: 50%; transform: translateY(-50%); text-align: center; width: 100%; }
-        #paywall { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 100; padding: 20px; box-sizing: border-box; }
-        button.main-btn { background: #ff4d4d; color: white; border: none; padding: 15px 40px; border-radius: 30px; font-size: 20px; cursor: pointer; font-weight: bold; margin-top: 20px; box-shadow: 0 4px 15px rgba(255, 77, 77, 0.4); }
+        #start-screen { position: absolute; top: 50%; transform: translateY(-50%); text-align: center; width: 100%; padding: 0 20px; box-sizing: border-box; }
+        #paywall { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 100; padding: 30px; box-sizing: border-box; }
+        button.main-btn { background: #ff4d4d; color: white; border: none; padding: 18px 50px; border-radius: 40px; font-size: 22px; cursor: pointer; font-weight: bold; margin-top: 30px; box-shadow: 0 6px 20px rgba(255, 77, 77, 0.4); }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1 style="color: #ff4d4d; font-size: 24px; margin: 0;">Sexy Snake 🔞</h1>
+    <div class="title-bar">
+        <h1>SEXY SNAKE 🔞</h1>
+        <p>让每一个点都充满惊喜...</p>
     </div>
 
     <div id="start-screen">
-        <p style="font-size: 16px; color: #ccc; padding: 0 20px;">建议戴上耳机体验感官效果<br>支持键盘方向键 & 屏幕按键</p>
-        <button class="main-btn" onclick="startGame()">开启感官模式 🎧</button>
+        <p style="font-size: 18px; color: #ccc;">戴上耳机 🎧 深度体验感官共鸣</p>
+        <button class="main-btn" onclick="startGame()">开启感官之旅</button>
     </div>
 
     <div class="info">Score: <span id="score">0</span></div>
     <canvas id="gameCanvas" width="400" height="400"></canvas>
 
-    <!-- 手机端按键 -->
     <div class="controls" id="mobileControls">
         <div class="btn btn-up" onclick="changeDir(0, -1)">▲</div>
         <div class="btn btn-left" onclick="changeDir(-1, 0)">◀</div>
@@ -46,9 +50,9 @@
     </div>
 
     <div id="paywall">
-        <h2 style="color: #ff4d4d;">想要更多刺激？🔥</h2>
-        <p style="font-size: 14px;">试玩结束。支付 <b>$1.99</b> 解锁完整御姐/娇喘配音包及无限时间！</p>
-        <button class="main-btn" onclick="window.location.href='https://buy.polar.sh/polar_cl_6oWCDP2tElIlXVJCri1uDPMXmnTu330WrVmeE1QhYuP'">立即通过 Polar 解锁 💳</button>
+        <h2 style="color: #ff4d4d; font-size: 32px;">快要到达顶峰了... 🔥</h2>
+        <p style="font-size: 16px; line-height: 1.6;">试玩结束。支付 <b>$1.99</b> 解锁完整御姐/娇喘配音包，并开启无限感官模式！</p>
+        <button class="main-btn" onclick="window.location.href='https://buy.polar.sh/polar_cl_6oWCDP2tElIlXVJCri1uDPMXmnTu330WrVmeE1QhYuP'">立即支付解锁 💳</button>
     </div>
 
     <script>
@@ -77,7 +81,7 @@
             startScreen.style.display = 'none';
             canvas.style.display = 'block';
             info.style.display = 'block';
-            controls.style.display = 'grid'; // 显示按键
+            controls.style.display = 'grid';
             gameStarted = true;
             sounds.forEach(s => { s.play().then(() => { s.pause(); s.currentTime = 0; }).catch(() => {}); });
             main();
@@ -96,13 +100,19 @@
 
         function main() {
             if (isGameOver || !gameStarted) return;
+            // 速度优化：220ms 让蛇走得慢一点，更稳一点
             setTimeout(function onTick() {
                 clearCanvas(); drawFood(); advanceSnake(); drawSnake(); main();
-            }, 160);
+            }, 220);
         }
 
         function clearCanvas() { ctx.fillStyle = "black"; ctx.fillRect(0, 0, canvas.width, canvas.height); }
-        function drawSnake() { snake.forEach(part => { ctx.fillStyle = "#ff4d4d"; ctx.fillRect(part.x * 20, part.y * 20, 18, 18); }); }
+        function drawSnake() { 
+            snake.forEach((part, i) => { 
+                ctx.fillStyle = i === 0 ? "#ff4d4d" : "#ff9999"; 
+                ctx.fillRect(part.x * 20, part.y * 20, 18, 18); 
+            }); 
+        }
         
         function advanceSnake() {
             const head = {x: (snake[0].x + dx + 20) % 20, y: (snake[0].y + dy + 20) % 20};
@@ -110,12 +120,21 @@
             if (head.x === food.x && head.y === food.y) {
                 score += 1; scoreEl.innerText = score;
                 playSexySound(); generateFood();
+                // 12 分弹出付费墙
                 if (score >= 12) { isGameOver = true; paywall.style.display = 'flex'; }
             } else { snake.pop(); }
         }
 
         function generateFood() { food.x = Math.floor(Math.random() * 20); food.y = Math.floor(Math.random() * 20); }
-        function drawFood() { ctx.fillStyle = "#ffcc00"; ctx.beginPath(); ctx.arc(food.x * 20 + 10, food.y * 20 + 10, 8, 0, 2 * Math.PI); ctx.fill(); }
+        function drawFood() { 
+            ctx.fillStyle = "#ffcc00"; 
+            ctx.beginPath(); 
+            ctx.arc(food.x * 20 + 10, food.y * 20 + 10, 8, 0, 2 * Math.PI); 
+            ctx.fill(); 
+            // 增加呼吸光晕效果
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = "#ffcc00";
+        }
 
         document.addEventListener('keydown', e => {
             if (e.key === 'ArrowUp') changeDir(0, -1);
