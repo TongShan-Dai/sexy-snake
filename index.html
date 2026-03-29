@@ -2,24 +2,53 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sexy Snake 🔞 - Sensory Experience</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sexy Snake 🔞 - Mobile Ready</title>
     <style>
-        body { background: #1a1a1a; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
-        canvas { background: #000; border: 4px solid #ff4d4d; box-shadow: 0 0 20px rgba(255, 77, 77, 0.5); }
-        .info { margin-bottom: 10px; font-size: 24px; color: #ff4d4d; font-weight: bold; }
-        #paywall { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
-        button { background: #ff4d4d; color: white; border: none; padding: 15px 40px; border-radius: 30px; font-size: 20px; cursor: pointer; font-weight: bold; margin-top: 20px; transition: transform 0.2s; }
-        button:hover { transform: scale(1.1); }
+        body { background: #1a1a1a; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100vh; margin: 0; overflow: hidden; touch-action: manipulation; }
+        .header { height: 60px; display: flex; align-items: center; justify-content: center; width: 100%; }
+        canvas { background: #000; border: 2px solid #ff4d4d; box-shadow: 0 0 15px rgba(255, 77, 77, 0.3); display: none; max-width: 90vw; max-height: 50vh; }
+        .info { font-size: 20px; color: #ff4d4d; font-weight: bold; margin: 5px 0; display: none; }
+        
+        /* 虚拟按键样式 */
+        .controls { display: none; grid-template-columns: repeat(3, 70px); grid-template-rows: repeat(2, 70px); gap: 10px; margin-top: 20px; }
+        .btn { background: rgba(255, 77, 77, 0.2); border: 2px solid #ff4d4d; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+        .btn:active { background: rgba(255, 77, 77, 0.6); transform: scale(0.95); }
+        .btn-up { grid-column: 2; }
+        .btn-left { grid-column: 1; grid-row: 2; }
+        .btn-down { grid-column: 2; grid-row: 2; }
+        .btn-right { grid-column: 3; grid-row: 2; }
+
+        #start-screen { position: absolute; top: 50%; transform: translateY(-50%); text-align: center; width: 100%; }
+        #paywall { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 100; padding: 20px; box-sizing: border-box; }
+        button.main-btn { background: #ff4d4d; color: white; border: none; padding: 15px 40px; border-radius: 30px; font-size: 20px; cursor: pointer; font-weight: bold; margin-top: 20px; box-shadow: 0 4px 15px rgba(255, 77, 77, 0.4); }
     </style>
 </head>
 <body>
+    <div class="header">
+        <h1 style="color: #ff4d4d; font-size: 24px; margin: 0;">Sexy Snake 🔞</h1>
+    </div>
+
+    <div id="start-screen">
+        <p style="font-size: 16px; color: #ccc; padding: 0 20px;">建议戴上耳机体验感官效果<br>支持键盘方向键 & 屏幕按键</p>
+        <button class="main-btn" onclick="startGame()">开启感官模式 🎧</button>
+    </div>
+
     <div class="info">Score: <span id="score">0</span></div>
     <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+    <!-- 手机端按键 -->
+    <div class="controls" id="mobileControls">
+        <div class="btn btn-up" onclick="changeDir(0, -1)">▲</div>
+        <div class="btn btn-left" onclick="changeDir(-1, 0)">◀</div>
+        <div class="btn btn-down" onclick="changeDir(0, 1)">▼</div>
+        <div class="btn btn-right" onclick="changeDir(1, 0)">▶</div>
+    </div>
+
     <div id="paywall">
-        <h1 style="color: #ff4d4d;">想要更多刺激？🔥</h1>
-        <p>试玩结束。支付 <b>$1.99</b> 解锁完整御姐配音包！</p>
-        <button onclick="window.location.href='https://buy.polar.sh/polar_cl_6oWCDP2tElIlXVJCri1uDPMXmnTu330WrVmeE1QhYuP'">立即通过 Polar 解锁 💳</button>
+        <h2 style="color: #ff4d4d;">想要更多刺激？🔥</h2>
+        <p style="font-size: 14px;">试玩结束。支付 <b>$1.99</b> 解锁完整御姐/娇喘配音包及无限时间！</p>
+        <button class="main-btn" onclick="window.location.href='https://buy.polar.sh/polar_cl_6oWCDP2tElIlXVJCri1uDPMXmnTu330WrVmeE1QhYuP'">立即通过 Polar 解锁 💳</button>
     </div>
 
     <script>
@@ -27,50 +56,73 @@
         const ctx = canvas.getContext('2d');
         const scoreEl = document.getElementById('score');
         const paywall = document.getElementById('paywall');
+        const startScreen = document.getElementById('start-screen');
+        const controls = document.getElementById('mobileControls');
+        const info = document.querySelector('.info');
+
+        const sounds = [
+            new Audio('https://www.myinstants.com/media/sounds/anime-gasp.mp3'),
+            new Audio('https://www.myinstants.com/media/sounds/ara-ara.mp3'),
+            new Audio('https://www.myinstants.com/media/sounds/anime-moan.mp3')
+        ];
 
         let snake = [{x: 10, y: 10}];
         let food = {x: 5, y: 5};
         let dx = 0, dy = -1;
         let score = 0;
         let isGameOver = false;
+        let gameStarted = false;
+
+        function startGame() {
+            startScreen.style.display = 'none';
+            canvas.style.display = 'block';
+            info.style.display = 'block';
+            controls.style.display = 'grid'; // 显示按键
+            gameStarted = true;
+            sounds.forEach(s => { s.play().then(() => { s.pause(); s.currentTime = 0; }).catch(() => {}); });
+            main();
+        }
+
+        function changeDir(nx, ny) {
+            if (gameStarted && (dx !== -nx || dy !== -ny)) { dx = nx; dy = ny; }
+        }
+
+        function playSexySound() {
+            const idx = Math.min(Math.floor(score / 4), sounds.length - 1);
+            const sound = sounds[idx].cloneNode();
+            sound.volume = 0.8;
+            sound.play().catch(() => {});
+        }
 
         function main() {
-            if (isGameOver) return;
+            if (isGameOver || !gameStarted) return;
             setTimeout(function onTick() {
-                clearCanvas();
-                drawFood();
-                advanceSnake();
-                drawSnake();
-                main();
-            }, 150);
+                clearCanvas(); drawFood(); advanceSnake(); drawSnake(); main();
+            }, 160);
         }
 
         function clearCanvas() { ctx.fillStyle = "black"; ctx.fillRect(0, 0, canvas.width, canvas.height); }
         function drawSnake() { snake.forEach(part => { ctx.fillStyle = "#ff4d4d"; ctx.fillRect(part.x * 20, part.y * 20, 18, 18); }); }
+        
         function advanceSnake() {
-            const head = {x: snake[0].x + dx, y: snake[0].y + dy};
-            // 穿墙逻辑
-            if (head.x < 0) head.x = 19; if (head.x > 19) head.x = 0;
-            if (head.y < 0) head.y = 19; if (head.y > 19) head.y = 0;
-            
+            const head = {x: (snake[0].x + dx + 20) % 20, y: (snake[0].y + dy + 20) % 20};
             snake.unshift(head);
             if (head.x === food.x && head.y === food.y) {
                 score += 1; scoreEl.innerText = score;
-                generateFood();
-                if (score >= 10) { isGameOver = true; paywall.style.display = 'flex'; }
+                playSexySound(); generateFood();
+                if (score >= 12) { isGameOver = true; paywall.style.display = 'flex'; }
             } else { snake.pop(); }
         }
+
         function generateFood() { food.x = Math.floor(Math.random() * 20); food.y = Math.floor(Math.random() * 20); }
         function drawFood() { ctx.fillStyle = "#ffcc00"; ctx.beginPath(); ctx.arc(food.x * 20 + 10, food.y * 20 + 10, 8, 0, 2 * Math.PI); ctx.fill(); }
 
         document.addEventListener('keydown', e => {
-            if (e.key === 'ArrowUp' && dy === 0) { dx = 0; dy = -1; }
-            if (e.key === 'ArrowDown' && dy === 0) { dx = 0; dy = 1; }
-            if (e.key === 'ArrowLeft' && dx === 0) { dx = -1; dy = 0; }
-            if (e.key === 'ArrowRight' && dx === 0) { dx = 1; dy = 0; }
+            if (e.key === 'ArrowUp') changeDir(0, -1);
+            if (e.key === 'ArrowDown') changeDir(0, 1);
+            if (e.key === 'ArrowLeft') changeDir(-1, 0);
+            if (e.key === 'ArrowRight') changeDir(1, 0);
         });
-
-        main();
     </script>
 </body>
 </html>
