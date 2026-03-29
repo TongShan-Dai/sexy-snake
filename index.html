@@ -1,12 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Sexy Snake 🔞 - Sensory Enhanced</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sexy Snake 🔞 - Sensory Experience</title>
+    <style>
+        body { background: #1a1a1a; color: white; font-family: sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; overflow: hidden; }
+        canvas { background: #000; border: 4px solid #ff4d4d; box-shadow: 0 0 20px rgba(255, 77, 77, 0.5); }
+        .info { margin-bottom: 10px; font-size: 24px; color: #ff4d4d; font-weight: bold; }
+        #paywall { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        button { background: #ff4d4d; color: white; border: none; padding: 15px 40px; border-radius: 30px; font-size: 20px; cursor: pointer; font-weight: bold; margin-top: 20px; transition: transform 0.2s; }
+        button:hover { transform: scale(1.1); }
+    </style>
+</head>
+<body>
+    <div class="info">Score: <span id="score">0</span></div>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div id="paywall">
+        <h1 style="color: #ff4d4d;">想要更多刺激？🔥</h1>
+        <p>试玩结束。支付 <b>$1.99</b> 解锁完整御姐配音包！</p>
+        <button onclick="window.location.href='https://buy.polar.sh/polar_cl_6oWCDP2tElIlXVJCri1uDPMXmnTu330WrVmeE1QhYuP'">立即通过 Polar 解锁 💳</button>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreEl = document.getElementById('score');
+        const paywall = document.getElementById('paywall');
+
+        let snake = [{x: 10, y: 10}];
+        let food = {x: 5, y: 5};
+        let dx = 0, dy = -1;
+        let score = 0;
+        let isGameOver = false;
+
+        function main() {
+            if (isGameOver) return;
+            setTimeout(function onTick() {
+                clearCanvas();
+                drawFood();
+                advanceSnake();
+                drawSnake();
+                main();
+            }, 150);
+        }
+
+        function clearCanvas() { ctx.fillStyle = "black"; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+        function drawSnake() { snake.forEach(part => { ctx.fillStyle = "#ff4d4d"; ctx.fillRect(part.x * 20, part.y * 20, 18, 18); }); }
+        function advanceSnake() {
+            const head = {x: snake[0].x + dx, y: snake[0].y + dy};
+            // 穿墙逻辑
+            if (head.x < 0) head.x = 19; if (head.x > 19) head.x = 0;
+            if (head.y < 0) head.y = 19; if (head.y > 19) head.y = 0;
+            
+            snake.unshift(head);
+            if (head.x === food.x && head.y === food.y) {
+                score += 1; scoreEl.innerText = score;
+                generateFood();
+                if (score >= 10) { isGameOver = true; paywall.style.display = 'flex'; }
+            } else { snake.pop(); }
+        }
+        function generateFood() { food.x = Math.floor(Math.random() * 20); food.y = Math.floor(Math.random() * 20); }
+        function drawFood() { ctx.fillStyle = "#ffcc00"; ctx.beginPath(); ctx.arc(food.x * 20 + 10, food.y * 20 + 10, 8, 0, 2 * Math.PI); ctx.fill(); }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'ArrowUp' && dy === 0) { dx = 0; dy = -1; }
+            if (e.key === 'ArrowDown' && dy === 0) { dx = 0; dy = 1; }
+            if (e.key === 'ArrowLeft' && dx === 0) { dx = -1; dy = 0; }
+            if (e.key === 'ArrowRight' && dx === 0) { dx = 1; dy = 0; }
+        });
+
+        main();
+    </script>
+</body>
 </html>
