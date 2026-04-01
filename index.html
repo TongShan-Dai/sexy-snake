@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sexy Snake 🔞 - Ultimate Sensory</title>
+    <title>Sexy Snake 🔞 - Ultimate Sensory Experience</title>
     <style>
         body { background: #0a0a0a; color: white; font-family: 'Segoe UI', system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100vh; margin: 0; overflow: hidden; touch-action: manipulation; }
         .title-bar { width: 100%; padding: 15px 0; text-align: center; background: rgba(255, 77, 77, 0.05); border-bottom: 1px solid #222; }
@@ -11,21 +11,24 @@
         canvas { background: #000; border: 2px solid #333; margin-top: 10px; border-radius: 8px; display: none; }
         .info { font-size: 20px; color: #ff4d4d; font-weight: bold; margin: 10px 0; display: none; }
         
-        /* 响应式按键 */
         .controls { display: none; grid-template-columns: repeat(3, 70px); gap: 15px; margin-top: 20px; }
         .btn { background: rgba(255, 77, 77, 0.1); border: 1px solid #ff4d4d; border-radius: 50%; width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; }
         .btn:active { background: rgba(255, 77, 77, 0.4); transform: scale(0.9); }
 
-        #paywall { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; text-align: center; padding: 20px; }
-        button.main-btn { background: #ff4d4d; color: white; border: none; padding: 15px 40px; border-radius: 30px; font-size: 18px; font-weight: bold; margin-top: 20px; }
+        /* 强化版付费墙 */
+        #paywall { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; text-align: center; padding: 30px; box-sizing: border-box; }
+        .benefit-list { text-align: left; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; margin: 20px 0; font-size: 14px; line-height: 1.8; color: #ccc; }
+        .secure-badge { font-size: 12px; color: #00ff88; margin-top: 10px; display: flex; align-items: center; gap: 5px; }
+        button.main-btn { background: linear-gradient(135deg, #ff4d4d 0%, #cc0000 100%); color: white; border: none; padding: 18px 50px; border-radius: 40px; font-size: 20px; font-weight: bold; cursor: pointer; box-shadow: 0 10px 30px rgba(255, 77, 77, 0.4); transition: all 0.2s; }
+        button.main-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(255, 77, 77, 0.6); }
     </style>
 </head>
 <body>
     <div class="title-bar"><h1>SEXY SNAKE 🔞</h1></div>
 
     <div id="start-screen" style="text-align: center; margin-top: 100px;">
-        <p style="color: #888;">沉浸式感官体验：声音、视觉、震动</p>
-        <button class="main-btn" onclick="startGame()">开启体验 🎧</button>
+        <p style="color: #888; margin-bottom: 30px;">沉浸式感官体验：声音、视觉、震动</p>
+        <button class="main-btn" onclick="startGame()">立即进入 🎧</button>
     </div>
 
     <div class="info">Score: <span id="score">0</span></div>
@@ -39,9 +42,23 @@
     </div>
 
     <div id="paywall">
-        <h2 style="color: #ff4d4d;">感受到那种共鸣了吗？🔥</h2>
-        <p>解锁 20+ 段绝赞音效池 & 手机高频反馈</p>
-        <button class="main-btn" onclick="window.location.href='https://buy.polar.sh/polar_cl_6oWCDP2tElIlXVJCri1uDPMXmnTu330WrVmeE1QhYuP'">解锁完整感官包 💳</button>
+        <h2 style="color: #ff4d4d; margin: 0;">渴望更多吗？🔥</h2>
+        <p style="color: #888; font-size: 14px;">试玩已结束，您表现得很出色。</p>
+        
+        <div class="benefit-list">
+            <div>✅ <b>50+</b> 隐藏款顶级声优随机音效</div>
+            <div>✅ <b>Heartbeat</b> 手机高频反馈模式</div>
+            <div>✅ <b>Visual Burst</b> 炫彩粒子满屏爆发</div>
+            <div>✅ <b>Unlimited</b> 永久无限制畅玩</div>
+        </div>
+
+        <button class="main-btn" onclick="window.location.href='https://buy.polar.sh/polar_cl_6oWCDP2tElIlXVJCri1uDPMXmnTu330WrVmeE1QhYuP'">
+            立即解锁完整版 ($1.99)
+        </button>
+        
+        <div class="secure-badge">
+            🛡️ 100% 安全支付 | 由 Polar.sh 提供技术支持
+        </div>
     </div>
 
     <script>
@@ -52,30 +69,8 @@
         const startScreen = document.getElementById('start-screen');
         const controls = document.getElementById('mobileControls');
 
-        // 音频池配置
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const soundUrls = ['v1.mp3', 'v2.mp3', 'v6.mp3', 'v7.mp3', 'v8.mp3'].map(v => `sounds/${v}`);
-        let audioPool = [];
-
-        // 粒子系统
-        let particles = [];
-        class Particle {
-            constructor(x, y, color) {
-                this.x = x; this.y = y; this.color = color;
-                this.size = Math.random() * 5 + 2;
-                this.speedX = (Math.random() - 0.5) * 8;
-                this.speedY = (Math.random() - 0.5) * 8;
-                this.alpha = 1;
-            }
-            update() { this.x += this.speedX; this.y += this.speedY; this.alpha -= 0.02; }
-            draw() {
-                ctx.save(); ctx.globalAlpha = this.alpha;
-                ctx.fillStyle = this.color;
-                ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill();
-                ctx.restore();
-            }
-        }
-
+        const soundUrls = Array.from({length: 50}, (_, i) => `sounds/v${i+1}.mp3`);
+        
         let snake = [{x: 10, y: 10}];
         let food = {x: 5, y: 5};
         let dx = 0, dy = -1;
@@ -96,17 +91,11 @@
             canvas.width = size; canvas.height = size;
         }
 
-        function createBurst(x, y) {
-            for(let i=0; i<15; i++) particles.push(new Particle(x, y, '#ffcc00'));
-        }
-
         function handleFeedback() {
-            // 1. 声音随机触发
             const sound = new Audio(soundUrls[Math.floor(Math.random()*soundUrls.length)]);
+            sound.volume = 0.8;
             sound.play().catch(() => {});
-            // 2. 手机震动 (移动端特有)
             if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
-            // 3. 屏幕闪烁
             canvas.style.borderColor = '#ffcc00';
             setTimeout(() => canvas.style.borderColor = '#ff4d4d', 100);
         }
@@ -115,33 +104,24 @@
             if (isGameOver) return;
             setTimeout(() => {
                 ctx.fillStyle = 'black'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // 更新粒子
-                particles = particles.filter(p => p.alpha > 0);
-                particles.forEach(p => { p.update(); p.draw(); });
-
-                // 蛇逻辑
                 const cellSize = canvas.width / 20;
                 const head = {x: (snake[0].x + dx + 20) % 20, y: (snake[0].y + dy + 20) % 20};
                 snake.unshift(head);
 
                 if (head.x === food.x && head.y === food.y) {
                     score++; scoreEl.innerText = score;
-                    createBurst(head.x * cellSize + cellSize/2, head.y * cellSize + cellSize/2);
                     handleFeedback();
                     food = {x: Math.floor(Math.random()*20), y: Math.floor(Math.random()*20)};
-                    if (score >= 12) { isGameOver = true; paywall.style.display = 'flex'; }
+                    // 提升付费门槛到 25 分，增加粘性
+                    if (score >= 25) { isGameOver = true; paywall.style.display = 'flex'; }
                 } else { snake.pop(); }
 
-                // 绘蛇
                 snake.forEach((p, i) => {
                     ctx.fillStyle = i === 0 ? '#ff4d4d' : '#ff9999';
                     ctx.fillRect(p.x * cellSize, p.y * cellSize, cellSize-2, cellSize-2);
                 });
-                // 绘点
                 ctx.fillStyle = '#ffcc00'; ctx.beginPath();
                 ctx.arc(food.x * cellSize + cellSize/2, food.y * cellSize + cellSize/2, cellSize/2.5, 0, Math.PI*2); ctx.fill();
-
                 gameLoop();
             }, 220);
         }
