@@ -10,56 +10,40 @@
         .title-bar h1 { color: #ff4d4d; font-size: 24px; margin: 0; letter-spacing: 3px; }
         canvas { background: #000; border: 2px solid #333; margin-top: 10px; border-radius: 8px; display: none; }
         .info { font-size: 20px; color: #ff4d4d; font-weight: bold; margin: 10px 0; display: none; }
-        
         .controls { display: none; grid-template-columns: repeat(3, 70px); gap: 15px; margin-top: 20px; }
         .btn { background: rgba(255, 77, 77, 0.1); border: 1px solid #ff4d4d; border-radius: 50%; width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; }
-        .btn:active { background: rgba(255, 77, 77, 0.4); transform: scale(0.9); }
-
-        /* 强化版付费墙 */
         #paywall { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; text-align: center; padding: 30px; box-sizing: border-box; }
         .benefit-list { text-align: left; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; margin: 20px 0; font-size: 14px; line-height: 1.8; color: #ccc; }
-        .secure-badge { font-size: 12px; color: #00ff88; margin-top: 10px; display: flex; align-items: center; gap: 5px; }
-        button.main-btn { background: linear-gradient(135deg, #ff4d4d 0%, #cc0000 100%); color: white; border: none; padding: 18px 50px; border-radius: 40px; font-size: 20px; font-weight: bold; cursor: pointer; box-shadow: 0 10px 30px rgba(255, 77, 77, 0.4); transition: all 0.2s; }
-        button.main-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 40px rgba(255, 77, 77, 0.6); }
+        button.main-btn { background: linear-gradient(135deg, #ff4d4d 0%, #cc0000 100%); color: white; border: none; padding: 18px 50px; border-radius: 40px; font-size: 20px; font-weight: bold; cursor: pointer; box-shadow: 0 10px 30px rgba(255, 77, 77, 0.4); }
+        
+        /* 成交滚动条 */
+        #sales-ticker { position: fixed; bottom: 10px; left: 10px; right: 10px; background: rgba(0,255,136,0.1); border: 1px solid #00ff88; border-radius: 10px; padding: 8px 15px; font-size: 12px; color: #00ff88; display: none; align-items: center; gap: 10px; z-index: 500; }
     </style>
 </head>
 <body>
     <div class="title-bar"><h1>SEXY SNAKE 🔞</h1></div>
-
     <div id="start-screen" style="text-align: center; margin-top: 100px;">
-        <p style="color: #888; margin-bottom: 30px;">沉浸式感官体验：声音、视觉、震动</p>
+        <p style="color: #888;">沉浸式感官体验：声音、视觉、震动</p>
         <button class="main-btn" onclick="startGame()">立即进入 🎧</button>
     </div>
-
     <div class="info">Score: <span id="score">0</span></div>
     <canvas id="gameCanvas"></canvas>
-
     <div class="controls" id="mobileControls">
         <div style="grid-column: 2" class="btn" onclick="changeDir(0, -1)">▲</div>
         <div style="grid-row: 2" class="btn" onclick="changeDir(-1, 0)">◀</div>
         <div style="grid-row: 2" class="btn" onclick="changeDir(0, 1)">▼</div>
         <div style="grid-row: 2" class="btn" onclick="changeDir(1, 0)">▶</div>
     </div>
-
     <div id="paywall">
-        <h2 style="color: #ff4d4d; margin: 0;">渴望更多吗？🔥</h2>
-        <p style="color: #888; font-size: 14px;">试玩已结束，您表现得很出色。</p>
-        
+        <h2 style="color: #ff4d4d;">渴望更多吗？🔥</h2>
         <div class="benefit-list">
             <div>✅ <b>50+</b> 隐藏款顶级声优随机音效</div>
             <div>✅ <b>Heartbeat</b> 手机高频反馈模式</div>
-            <div>✅ <b>Visual Burst</b> 炫彩粒子满屏爆发</div>
             <div>✅ <b>Unlimited</b> 永久无限制畅玩</div>
         </div>
-
-        <button class="main-btn" onclick="window.location.href='https://buy.polar.sh/polar_cl_6oWCDP2tElIlXVJCri1uDPMXmnTu330WrVmeE1QhYuP'">
-            立即解锁完整版 ($1.99)
-        </button>
-        
-        <div class="secure-badge">
-            🛡️ 100% 安全支付 | 由 Polar.sh 提供技术支持
-        </div>
+        <button class="main-btn" onclick="window.location.href='https://buy.polar.sh/polar_cl_6oWCDP2tElIlXVJCri1uDPMXmnTu330WrVmeE1QhYuP'">立即解锁完整版 ($1.99)</button>
     </div>
+    <div id="sales-ticker"><span id="ticker-text"></span></div>
 
     <script>
         const canvas = document.getElementById('gameCanvas');
@@ -68,38 +52,17 @@
         const paywall = document.getElementById('paywall');
         const startScreen = document.getElementById('start-screen');
         const controls = document.getElementById('mobileControls');
-
         const soundUrls = Array.from({length: 50}, (_, i) => `sounds/v${i+1}.mp3`);
-        
-        let snake = [{x: 10, y: 10}];
-        let food = {x: 5, y: 5};
-        let dx = 0, dy = -1;
-        let score = 0;
-        let isGameOver = false;
+        let snake = [{x: 10, y: 10}], food = {x: 5, y: 5}, dx = 0, dy = -1, score = 0, isGameOver = false;
 
-        function startGame() {
-            startScreen.style.display = 'none';
-            canvas.style.display = 'block';
-            document.querySelector('.info').style.display = 'block';
-            controls.style.display = 'grid';
-            resizeCanvas();
-            gameLoop();
-        }
-
-        function resizeCanvas() {
-            const size = Math.min(window.innerWidth * 0.9, 400);
-            canvas.width = size; canvas.height = size;
-        }
-
+        function startGame() { startScreen.style.display = 'none'; canvas.style.display = 'block'; document.querySelector('.info').style.display = 'block'; controls.style.display = 'grid'; resizeCanvas(); gameLoop(); }
+        function resizeCanvas() { const size = Math.min(window.innerWidth * 0.9, 400); canvas.width = size; canvas.height = size; }
         function handleFeedback() {
             const sound = new Audio(soundUrls[Math.floor(Math.random()*soundUrls.length)]);
-            sound.volume = 0.8;
-            sound.play().catch(() => {});
+            sound.volume = 0.8; sound.play().catch(() => {});
             if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
-            canvas.style.borderColor = '#ffcc00';
-            setTimeout(() => canvas.style.borderColor = '#ff4d4d', 100);
+            canvas.style.borderColor = '#ffcc00'; setTimeout(() => canvas.style.borderColor = '#ff4d4d', 100);
         }
-
         function gameLoop() {
             if (isGameOver) return;
             setTimeout(() => {
@@ -107,32 +70,28 @@
                 const cellSize = canvas.width / 20;
                 const head = {x: (snake[0].x + dx + 20) % 20, y: (snake[0].y + dy + 20) % 20};
                 snake.unshift(head);
-
                 if (head.x === food.x && head.y === food.y) {
-                    score++; scoreEl.innerText = score;
-                    handleFeedback();
+                    score++; scoreEl.innerText = score; handleFeedback();
                     food = {x: Math.floor(Math.random()*20), y: Math.floor(Math.random()*20)};
-                    // 提升付费门槛到 25 分，增加粘性
                     if (score >= 25) { isGameOver = true; paywall.style.display = 'flex'; }
                 } else { snake.pop(); }
-
-                snake.forEach((p, i) => {
-                    ctx.fillStyle = i === 0 ? '#ff4d4d' : '#ff9999';
-                    ctx.fillRect(p.x * cellSize, p.y * cellSize, cellSize-2, cellSize-2);
-                });
-                ctx.fillStyle = '#ffcc00'; ctx.beginPath();
-                ctx.arc(food.x * cellSize + cellSize/2, food.y * cellSize + cellSize/2, cellSize/2.5, 0, Math.PI*2); ctx.fill();
+                snake.forEach((p, i) => { ctx.fillStyle = i === 0 ? '#ff4d4d' : '#ff9999'; ctx.fillRect(p.x * cellSize, p.y * cellSize, cellSize-2, cellSize-2); });
+                ctx.fillStyle = '#ffcc00'; ctx.beginPath(); ctx.arc(food.x * cellSize + cellSize/2, food.y * cellSize + cellSize/2, cellSize/2.5, 0, Math.PI*2); ctx.fill();
                 gameLoop();
             }, 220);
         }
-
         function changeDir(nx, ny) { if (dx !== -nx || dy !== -ny) { dx = nx; dy = ny; } }
-        document.addEventListener('keydown', e => {
-            if (e.key === 'ArrowUp') changeDir(0, -1);
-            if (e.key === 'ArrowDown') changeDir(0, 1);
-            if (e.key === 'ArrowLeft') changeDir(-1, 0);
-            if (e.key === 'ArrowRight') changeDir(1, 0);
-        });
+        document.addEventListener('keydown', e => { if (e.key === 'ArrowUp') changeDir(0, -1); if (e.key === 'ArrowDown') changeDir(0, 1); if (e.key === 'ArrowLeft') changeDir(-1, 0); if (e.key === 'ArrowRight') changeDir(1, 0); });
+
+        // 虚拟成交
+        const salesData = ["User ***k82 just unlocked Full Voice Pack! 🍑", "Someone from Japan 🇯🇵 just purchased Unlimited Mode!", "User ***m19 just enabled Heartbeat Vibe! 💓"];
+        setInterval(() => {
+            if(Math.random() > 0.7) {
+                const ticker = document.getElementById('sales-ticker');
+                document.getElementById('ticker-text').innerText = salesData[Math.floor(Math.random() * salesData.length)];
+                ticker.style.display = 'flex'; setTimeout(() => { ticker.style.display = 'none'; }, 4000);
+            }
+        }, 12000);
     </script>
 </body>
 </html>
