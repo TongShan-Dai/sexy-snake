@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sexy Tetris 🔞 - Sensory Combo</title>
+    <style>
+        body { background: #0a0a0a; color: white; font-family: 'Segoe UI', system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100vh; margin: 0; overflow: hidden; touch-action: manipulation; }
+        .title-bar { width: 100%; padding: 15px 0; text-align: center; border-bottom: 1px solid #222; }
+        .title-bar h1 { color: #ff4d4d; font-size: 24px; margin: 0; letter-spacing: 3px; }
+        #game-container { position: relative; margin-top: 10px; }
+        canvas { background: #000; border: 2px solid #333; border-radius: 8px; }
+        .info { font-size: 18px; color: #ff4d4d; margin: 10px 0; }
+        .controls { display: grid; grid-template-columns: repeat(3, 70px); gap: 10px; margin-top: 15px; }
+        .btn { background: rgba(255, 77, 77, 0.1); border: 1px solid #ff4d4d; border-radius: 50%; width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: white; }
+        #paywall { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; text-align: center; padding: 20px; }
+        button.main-btn { background: #ff4d4d; color: white; border: none; padding: 15px 40px; border-radius: 30px; font-size: 18px; font-weight: bold; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="title-bar"><h1>SEXY TETRIS 🔞</h1></div>
+    <div id="start-screen" style="text-align: center; margin-top: 100px;">
+        <button class="main-btn" onclick="startGame()">开始方块感官之旅 🎧</button>
+    </div>
+    <div id="game-container">
+        <div class="info">Rows: <span id="lines">0</span> | Score: <span id="score">0</span></div>
+        <canvas id="tetris" width="240" height="400"></canvas>
+        <div id="paywall">
+            <h2 style="color: #ff4d4d;">Combo 结束... 想要更多吗？🔥</h2>
+            <p>解锁 80+ 极致声效包 & 全屏震动模式</p>
+            <button class="main-btn" onclick="window.location.href='https://buy.polar.sh/polar_cl_6oWCDP2tElIlXVJCri1uDPMXmnTu330WrVmeE1QhYuP'">立即支付 $1.99 💳</button>
+        </div>
+    </div>
+    <div class="controls">
+        <div class="btn" onclick="move(-1)">◀</div>
+        <div class="btn" onclick="rotate()">↻</div>
+        <div class="btn" onclick="move(1)">▶</div>
+        <div style="grid-column: 2" class="btn" onclick="drop()">▼</div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('tetris');
+        const context = canvas.getContext('2d');
+        context.scale(20, 20);
+
+        // 使用贪吃蛇里已经生产好的 50 段音效
+        const soundUrls = Array.from({length: 50}, (_, i) => `https://tongshan-dai.github.io/sexy-snake/sounds/v${i+1}.mp3`);
+
+        function playSfx() {
+            const audio = new Audio(soundUrls[Math.floor(Math.random() * soundUrls.length)]);
+            audio.play().catch(() => {});
+            if (navigator.vibrate) navigator.vibrate([50, 30, 50]);
+        }
+
+        function arenaSweep() {
+            let rowCount = 1;
+            outer: for (let y = arena.length - 1; y > 0; --y) {
+                for (let x = 0; x < arena[y].length; ++x) {
+                    if (arena[y][x] === 0) continue outer;
+                }
+                const row = arena.splice(y, 1)[0].fill(0);
+                arena.unshift(row);
+                ++y;
+                player.score += rowCount * 10;
+                player.lines += 1;
+                rowCount *= 2;
+                playSfx(); // 消除时触发音效
+                if (player.lines >= 20) { isPaused = true; document.getElementById('paywall').style.display = 'flex'; }
+            }
+        }
+
+        // --- 核心俄罗斯方块引擎 (简化版) ---
+        const matrix = [[0,0,0],[1,1,1],[0,1,0]]; // 示例 T 形
+        const arena = Array.from({length: 20}, () => Array(12).fill(0));
+        const player = { pos: {x: 5, y: 0}, matrix: matrix, score: 0, lines: 0 };
+        let isPaused = true;
+
+        function draw() {
+            context.fillStyle = '#000';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            drawMatrix(arena, {x: 0, y: 0});
+            drawMatrix(player.matrix, player.pos);
+        }
+
+        function drawMatrix(matrix, offset) {
+            matrix.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value !== 0) {
+                        context.fillStyle = '#ff4d4d';
+                        context.fillRect(x + offset.x, y + offset.y, 1, 1);
+                    }
+                });
+            });
+        }
+
+        function playerDrop() {
+            player.pos.y++;
+            if (collide(arena, player)) {
+                player.pos.y--;
+                merge(arena, player);
+                playerReset();
+                arenaSweep();
+                updateScore();
+            }
+            dropCounter = 0;
+        }
+
+        function collide(arena, player) {
+            const [m, o] = [player.matrix, player.pos];
+            for (let y = 0; y < m.length; ++y) {
+                for (let x = 0; x < m[y].length; ++x) {
+                    if (m[y][x] !== 0 && (arena[y + o.y] && arena[y + o.y][x + o.x]) !== 0) return true;
+                }
+            }
+            return false;
+        }
+
+        function merge(arena, player) {
+            player.matrix.forEach((row, y) => {
+                row.forEach((value, x) => {
+                    if (value !== 0) arena[y + player.pos.y][x + player.pos.x] = value;
+                });
+            });
+        }
+
+        function playerReset() {
+            player.pos.y = 0;
+            player.pos.x = 5;
+            if (collide(arena, player)) arena.forEach(row => row.fill(0));
+        }
+
+        let dropCounter = 0;
+        let lastTime = 0;
+        function update(time = 0) {
+            if (isPaused) return;
+            const deltaTime = time - lastTime;
+            lastTime = time;
+            dropCounter += deltaTime;
+            if (dropCounter > 1000) playerDrop();
+            draw();
+            requestAnimationFrame(update);
+        }
+
+        function startGame() { 
+            document.getElementById('start-screen').style.display = 'none'; 
+            isPaused = false; 
+            update(); 
+        }
+
+        function updateScore() {
+            document.getElementById('score').innerText = player.score;
+            document.getElementById('lines').innerText = player.lines;
+        }
+
+        function move(dir) { player.pos.x += dir; if (collide(arena, player)) player.pos.x -= dir; }
+        function rotate() { 
+            const pos = player.pos.x;
+            let offset = 1;
+            rotateMatrix(player.matrix);
+            while (collide(arena, player)) {
+                player.pos.x += offset;
+                offset = -(offset + (offset > 0 ? 1 : -1));
+                if (offset > player.matrix[0].length) { rotateMatrix(player.matrix, -1); player.pos.x = pos; return; }
+            }
+        }
+        function rotateMatrix(matrix) { for (let y = 0; y < matrix.length; ++y) { for (let x = 0; x < y; ++x) { [matrix[x][y], matrix[y][x]] = [matrix[y][x], matrix[x][y]]; } } matrix.forEach(row => row.reverse()); }
+        function drop() { playerDrop(); }
+    </script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sexy Breakout 🔞 - Sensory Impact</title>
+    <style>
+        body { background: #050505; color: white; font-family: system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100vh; margin: 0; overflow: hidden; touch-action: none; }
+        .title-bar { width: 100%; padding: 15px 0; text-align: center; background: rgba(255, 77, 77, 0.05); border-bottom: 1px solid #222; }
+        .title-bar h1 { color: #ff4d4d; font-size: 24px; margin: 0; letter-spacing: 3px; }
+        canvas { background: #000; border: 2px solid #333; margin-top: 20px; border-radius: 8px; touch-action: none; }
+        #paywall { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; text-align: center; padding: 20px; box-sizing: border-box; }
+        button.main-btn { background: #ff4d4d; color: white; border: none; padding: 15px 40px; border-radius: 30px; font-size: 18px; font-weight: bold; margin-top: 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="title-bar"><h1>SEXY BREAKOUT 🔞</h1></div>
+    <div id="start-screen" style="text-align: center; margin-top: 100px;">
+        <p style="color: #888;">每一次撞击，都是一次感官的颤抖...</p>
+        <button class="main-btn" onclick="startGame()">开启感官之旅 🎧</button>
+    </div>
+    
+    <canvas id="gameCanvas"></canvas>
+
+    <div id="paywall">
+        <h2 style="color: #ff4d4d;">感受到这股热浪了吗？🔥</h2>
+        <p>试玩结束。支付 <b>$1.99</b> 解锁 100+ 碰撞娇喘语音包 & 物理震动反馈模式</p>
+        <button class="main-btn" onclick="window.location.href='https://buy.polar.sh/polar_cl_6oWCDP2tElIlXVJCri1uDPMXmnTu330WrVmeE1QhYuP'">立即解锁 💳</button>
+        <div style="margin-top: 20px;">
+            <a href="https://tongshan-dai.github.io/sexy-snake/" style="color: #ffcc00; font-size: 14px; text-decoration: none;">🐍 试试【性感贪吃蛇】 >></a>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const paywall = document.getElementById('paywall');
+        const soundUrls = Array.from({length: 50}, (_, i) => `https://tongshan-dai.github.io/sexy-snake/sounds/v${i+1}.mp3`);
+
+        let score = 0, isGameOver = false, gameStarted = false;
+        const ball = { x: 200, y: 300, dx: 4, dy: -4, radius: 8 };
+        const paddle = { width: 80, height: 10, x: 160 };
+        const bricks = [];
+        const rows = 5, cols = 6, brickW = 60, brickH = 20, padding = 5;
+
+        for(let c=0; c<cols; c++) {
+            bricks[c] = [];
+            for(let r=0; r<rows; r++) { bricks[c][r] = { x: 0, y: 0, status: 1 }; }
+        }
+
+        function startGame() {
+            document.getElementById('start-screen').style.display = 'none';
+            canvas.style.display = 'block';
+            resize();
+            gameStarted = true;
+            draw();
+        }
+
+        function resize() {
+            canvas.width = Math.min(window.innerWidth * 0.9, 400);
+            canvas.height = 450;
+        }
+
+        function playSfx() {
+            const sound = new Audio(soundUrls[Math.floor(Math.random()*soundUrls.length)]);
+            sound.volume = 0.7; sound.play().catch(() => {});
+            if (navigator.vibrate) navigator.vibrate([20, 40]);
+        }
+
+        function draw() {
+            if (!gameStarted || isGameOver) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘砖块
+            for(let c=0; c<cols; c++) {
+                for(let r=0; r<rows; r++) {
+                    if(bricks[c][r].status === 1) {
+                        let bx = (c*(brickW+padding)) + 15;
+                        let by = (r*(brickH+padding)) + 50;
+                        bricks[c][r].x = bx; bricks[c][r].y = by;
+                        ctx.fillStyle = "#ff4d4d";
+                        ctx.fillRect(bx, by, brickW, brickH);
+                    }
+                }
+            }
+
+            // 绘球
+            ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI*2);
+            ctx.fillStyle = "#ffcc00"; ctx.fill(); ctx.closePath();
+
+            // 绘挡板
+            ctx.fillStyle = "white";
+            ctx.fillRect(paddle.x, canvas.height - 20, paddle.width, paddle.height);
+
+            // 碰撞检测
+            for(let c=0; c<cols; c++) {
+                for(let r=0; r<rows; r++) {
+                    let b = bricks[c][r];
+                    if(b.status === 1) {
+                        if(ball.x > b.x && ball.x < b.x+brickW && ball.y > b.y && ball.y < b.y+brickH) {
+                            ball.dy = -ball.dy; b.status = 0; score++;
+                            playSfx();
+                            if(score >= 15) { isGameOver = true; paywall.style.display = 'flex'; }
+                        }
+                    }
+                }
+            }
+
+            if(ball.x + ball.dx > canvas.width-ball.radius || ball.x + ball.dx < ball.radius) ball.dx = -ball.dx;
+            if(ball.y + ball.dy < ball.radius) ball.dy = -ball.dy;
+            else if(ball.y + ball.dy > canvas.height - ball.radius) {
+                if(ball.x > paddle.x && ball.x < paddle.x + paddle.width) { ball.dy = -ball.dy; playSfx(); }
+                else { location.reload(); }
+            }
+
+            ball.x += ball.dx; ball.y += ball.dy;
+            requestAnimationFrame(draw);
+        }
+
+        document.addEventListener("mousemove", e => {
+            let relativeX = e.clientX - canvas.offsetLeft;
+            if(relativeX > 0 && relativeX < canvas.width) paddle.x = relativeX - paddle.width/2;
+        });
+        document.addEventListener("touchmove", e => {
+            let relativeX = e.touches[0].clientX - canvas.offsetLeft;
+            if(relativeX > 0 && relativeX < canvas.width) paddle.x = relativeX - paddle.width/2;
+        });
+    </script>
+</body>
+</html>

@@ -2,96 +2,65 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Sexy Snake 🔞 - Ultimate Sensory Experience</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensory Gaming Hub 🔞 - Ultimate Trilogy</title>
     <style>
-        body { background: #0a0a0a; color: white; font-family: 'Segoe UI', system-ui, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; height: 100vh; margin: 0; overflow: hidden; touch-action: manipulation; }
-        .title-bar { width: 100%; padding: 15px 0; text-align: center; background: rgba(255, 77, 77, 0.05); border-bottom: 1px solid #222; }
-        .title-bar h1 { color: #ff4d4d; font-size: 24px; margin: 0; letter-spacing: 3px; }
-        canvas { background: #000; border: 2px solid #333; margin-top: 10px; border-radius: 8px; display: none; }
-        .info { font-size: 20px; color: #ff4d4d; font-weight: bold; margin: 10px 0; display: none; }
-        .controls { display: none; grid-template-columns: repeat(3, 70px); gap: 15px; margin-top: 20px; }
-        .btn { background: rgba(255, 77, 77, 0.1); border: 1px solid #ff4d4d; border-radius: 50%; width: 70px; height: 70px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: white; }
-        #paywall { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; text-align: center; padding: 30px; box-sizing: border-box; }
-        .benefit-list { text-align: left; background: rgba(255,255,255,0.05); padding: 20px; border-radius: 15px; margin: 20px 0; font-size: 14px; line-height: 1.8; color: #ccc; }
-        button.main-btn { background: linear-gradient(135deg, #ff4d4d 0%, #cc0000 100%); color: white; border: none; padding: 18px 50px; border-radius: 40px; font-size: 20px; font-weight: bold; cursor: pointer; box-shadow: 0 10px 30px rgba(255, 77, 77, 0.4); }
+        body { background: #050505; color: white; font-family: 'Segoe UI', sans-serif; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        .hero { width: 100%; padding: 40px 20px; text-align: center; background: linear-gradient(180deg, #1a0505 0%, #050505 100%); border-bottom: 1px solid #331111; }
+        .hero h1 { color: #ff4d4d; font-size: 32px; letter-spacing: 4px; margin: 0; }
+        .hero p { color: #888; margin-top: 10px; font-size: 14px; }
         
-        /* 成交滚动条 */
-        #sales-ticker { position: fixed; bottom: 10px; left: 10px; right: 10px; background: rgba(0,255,136,0.1); border: 1px solid #00ff88; border-radius: 10px; padding: 8px 15px; font-size: 12px; color: #00ff88; display: none; align-items: center; gap: 10px; z-index: 500; }
+        .game-grid { display: grid; grid-template-columns: 1fr; gap: 20px; padding: 20px; width: 100%; max-width: 400px; }
+        .game-card { background: #111; border: 1px solid #222; border-radius: 15px; overflow: hidden; transition: transform 0.2s; cursor: pointer; position: relative; }
+        .game-card:hover { transform: translateY(-5px); border-color: #ff4d4d; }
+        .game-info { padding: 15px; }
+        .game-info h3 { margin: 0; color: #ff4d4d; }
+        .game-info p { font-size: 12px; color: #666; margin: 5px 0 0 0; }
+        .tag { position: absolute; top: 10px; right: 10px; background: #ff4d4d; color: white; font-size: 10px; padding: 2px 8px; border-radius: 10px; font-weight: bold; }
+
+        .footer { margin-top: 40px; padding: 20px; text-align: center; color: #444; font-size: 10px; border-top: 1px solid #111; width: 100%; }
     </style>
 </head>
 <body>
-    <div class="title-bar"><h1>SEXY SNAKE 🔞</h1></div>
-    <div id="start-screen" style="text-align: center; margin-top: 100px;">
-        <p style="color: #888;">沉浸式感官体验：声音、视觉、震动</p>
-        <button class="main-btn" onclick="startGame()">立即进入 🎧</button>
+    <div class="hero">
+        <h1>SENSORY HUB 🔞</h1>
+        <p>每一口、每一块、每一次撞击，都是极致感官反馈</p>
     </div>
-    <div class="info">Score: <span id="score">0</span></div>
-    <canvas id="gameCanvas"></canvas>
-    <div class="controls" id="mobileControls">
-        <div style="grid-column: 2" class="btn" onclick="changeDir(0, -1)">▲</div>
-        <div style="grid-row: 2" class="btn" onclick="changeDir(-1, 0)">◀</div>
-        <div style="grid-row: 2" class="btn" onclick="changeDir(0, 1)">▼</div>
-        <div style="grid-row: 2" class="btn" onclick="changeDir(1, 0)">▶</div>
-    </div>
-    <div id="paywall">
-        <h2 style="color: #ff4d4d;">渴望更多吗？🔥</h2>
-        <div class="benefit-list">
-            <div>✅ <b>50+</b> 隐藏款顶级声优随机音效</div>
-            <div>✅ <b>Heartbeat</b> 手机高频反馈模式</div>
-            <div>✅ <b>Unlimited</b> 永久无限制畅玩</div>
+
+    <div class="game-grid">
+        <div class="game-card" onclick="window.location.href='snake.html'">
+            <div class="tag">HOT</div>
+            <div class="game-info">
+                <h3>🐍 性感贪吃蛇</h3>
+                <p>50+ 撩人声效，挑战你的持久力</p>
+            </div>
         </div>
-        <button class="main-btn" onclick="window.location.href='https://buy.polar.sh/polar_cl_6oWCDP2tElIlXVJCri1uDPMXmnTu330WrVmeE1QhYuP'">立即解锁完整版 ($1.99)</button>
+
+        <div class="game-card" onclick="window.location.href='tetris.html'">
+            <div class="tag">NEW</div>
+            <div class="game-info">
+                <h3>🧱 性感俄罗斯方块</h3>
+                <p>消除的快感，连消的巅峰音效</p>
+            </div>
+        </div>
+
+        <div class="game-card" onclick="window.location.href='breakout.html'">
+            <div class="game-info">
+                <h3>🥎 性感打砖块</h3>
+                <p>高频物理碰撞反馈，心跳震动</p>
+            </div>
+        </div>
     </div>
-    <div id="sales-ticker"><span id="ticker-text"></span></div>
 
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const scoreEl = document.getElementById('score');
-        const paywall = document.getElementById('paywall');
-        const startScreen = document.getElementById('start-screen');
-        const controls = document.getElementById('mobileControls');
-        const soundUrls = Array.from({length: 50}, (_, i) => `sounds/v${i+1}.mp3`);
-        let snake = [{x: 10, y: 10}], food = {x: 5, y: 5}, dx = 0, dy = -1, score = 0, isGameOver = false;
+    <div style="margin-top: 20px; text-align: center; width: 100%; padding: 0 20px; box-sizing: border-box;">
+        <button onclick="window.location.href='https://buy.polar.sh/polar_cl_6oWCDP2tElIlXVJCri1uDPMXmnTu330WrVmeE1QhYuP'" 
+                style="background: #ff4d4d; color: white; border: none; padding: 15px 40px; border-radius: 30px; font-weight: bold; cursor: pointer; width: 100%; max-width: 300px;">
+            解锁全家桶感官包 ($1.99)
+        </button>
+    </div>
 
-        function startGame() { startScreen.style.display = 'none'; canvas.style.display = 'block'; document.querySelector('.info').style.display = 'block'; controls.style.display = 'grid'; resizeCanvas(); gameLoop(); }
-        function resizeCanvas() { const size = Math.min(window.innerWidth * 0.9, 400); canvas.width = size; canvas.height = size; }
-        function handleFeedback() {
-            const sound = new Audio(soundUrls[Math.floor(Math.random()*soundUrls.length)]);
-            sound.volume = 0.8; sound.play().catch(() => {});
-            if (navigator.vibrate) navigator.vibrate([30, 50, 30]);
-            canvas.style.borderColor = '#ffcc00'; setTimeout(() => canvas.style.borderColor = '#ff4d4d', 100);
-        }
-        function gameLoop() {
-            if (isGameOver) return;
-            setTimeout(() => {
-                ctx.fillStyle = 'black'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                const cellSize = canvas.width / 20;
-                const head = {x: (snake[0].x + dx + 20) % 20, y: (snake[0].y + dy + 20) % 20};
-                snake.unshift(head);
-                if (head.x === food.x && head.y === food.y) {
-                    score++; scoreEl.innerText = score; handleFeedback();
-                    food = {x: Math.floor(Math.random()*20), y: Math.floor(Math.random()*20)};
-                    if (score >= 25) { isGameOver = true; paywall.style.display = 'flex'; }
-                } else { snake.pop(); }
-                snake.forEach((p, i) => { ctx.fillStyle = i === 0 ? '#ff4d4d' : '#ff9999'; ctx.fillRect(p.x * cellSize, p.y * cellSize, cellSize-2, cellSize-2); });
-                ctx.fillStyle = '#ffcc00'; ctx.beginPath(); ctx.arc(food.x * cellSize + cellSize/2, food.y * cellSize + cellSize/2, cellSize/2.5, 0, Math.PI*2); ctx.fill();
-                gameLoop();
-            }, 220);
-        }
-        function changeDir(nx, ny) { if (dx !== -nx || dy !== -ny) { dx = nx; dy = ny; } }
-        document.addEventListener('keydown', e => { if (e.key === 'ArrowUp') changeDir(0, -1); if (e.key === 'ArrowDown') changeDir(0, 1); if (e.key === 'ArrowLeft') changeDir(-1, 0); if (e.key === 'ArrowRight') changeDir(1, 0); });
-
-        // 虚拟成交
-        const salesData = ["User ***k82 just unlocked Full Voice Pack! 🍑", "Someone from Japan 🇯🇵 just purchased Unlimited Mode!", "User ***m19 just enabled Heartbeat Vibe! 💓"];
-        setInterval(() => {
-            if(Math.random() > 0.7) {
-                const ticker = document.getElementById('sales-ticker');
-                document.getElementById('ticker-text').innerText = salesData[Math.floor(Math.random() * salesData.length)];
-                ticker.style.display = 'flex'; setTimeout(() => { ticker.style.display = 'none'; }, 4000);
-            }
-        }, 12000);
-    </script>
+    <div class="footer">
+        100% 安全支付 | 离线运行模式 | 建议佩戴耳机体验
+    </div>
 </body>
 </html>
